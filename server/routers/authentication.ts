@@ -1,4 +1,6 @@
 import { Router, Request, Response } from "express";
+import { validateLogin, validateRegister } from "../middlwares/validations";
+import { validationResult } from "express-validator";
 
 const router: Router = Router();
 
@@ -8,15 +10,36 @@ router.post("/logout-stateless", (req: Request, res: Response) => {
   res.send("Hello World Logout");
 });
 
-router.post("/login-stateless", (req, res) => {
-  console.log("login-stateless", req.body);
-  res.send("Hello World Login");
-});
+router.post(
+  "/login-stateless",
+  validateLogin,
+  (req: Request, res: Response) => {
+    const errors = validationResult(req);
 
-router.post("/register-stateless", (req, res) => {
-  console.log("register-stateless", req.body);
-  res.send("Hello World Register");
-});
+    if (!errors.isEmpty()) {
+      res.status(400).json({ errors: errors.array() });
+      return;
+    }
+
+    console.log("login-stateless", req.body);
+    res.send("Hello World Login");
+  }
+);
+
+router.post(
+  "/register-stateless",
+  validateRegister,
+  (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(400).json({ errors: errors.array() });
+      return;
+    }
+
+    console.log("register-stateless", req.body);
+    res.send("Hello World Register");
+  }
+);
 
 // Handle stateful authentication
 router.post("/logout-stateful", (req, res) => {
@@ -24,14 +47,30 @@ router.post("/logout-stateful", (req, res) => {
   res.send("Hello World Logout");
 });
 
-router.post("/login-stateful", (req, res) => {
+router.post("/login-stateful", validateLogin, (req: Request, res: Response) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.status(400).json({ errors: errors.array() });
+    return;
+  }
+
   console.log("login-stateful", req.body);
   res.send("Hello World Login");
 });
 
-router.post("/register-stateful", (req, res) => {
-  console.log("register-stateful", req.body);
-  res.send("Hello World Register");
-});
+router.post(
+  "/register-stateful",
+  validateRegister,
+  (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(400).json({ errors: errors.array() });
+      return;
+    }
+
+    console.log("register-stateful", req.body);
+    res.send("Hello World Register");
+  }
+);
 
 export default router;
