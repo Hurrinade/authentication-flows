@@ -14,7 +14,4 @@ COPY package.json pnpm-lock.yaml* ./
 RUN pnpm install
 
 # Copy source code
-COPY . .
-
-# Start the development application
-CMD ["pnpm", "run", "dev"] 
+COPY . . 
