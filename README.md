@@ -11,6 +11,15 @@ This is a full-stack authentication demonstration project built with modern web 
 - final prisma models
 - production build and dockerization
 
+## What is going on 🤓
+
+1. **Statless basic**
+
+<img src="./images/stateless-simple.png" width="700" height="600" />
+
+2. **Stateless With refresh token**
+3. **Statefull**
+
 ## Tech Stack
 
 ### Frontend
@@ -61,7 +70,7 @@ Content:
 PORT=3000
 # Server env
 NODE_ENV=development
-# Local dockerized db url
+# Local dockerized db url, database container port and domain
 DATABASE_URL="postgres://exampleuser:examplepassword@database:5432/authentications"
 # Custom db password
 POSTGRES_PASSWORD=examplepassword
