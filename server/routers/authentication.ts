@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
 import { validateLogin, validateRegister } from "../middlwares/validations";
 import { validationResult } from "express-validator";
-import { createUser } from "../services/userService";
+import { createUser, getUser } from "../services/userService";
 
 const router: Router = Router();
 
@@ -14,13 +14,28 @@ router.post("/logout-stateless", (req: Request, res: Response) => {
 router.post(
   "/login-stateless",
   validateLogin,
-  (req: Request, res: Response) => {
+  async (req: Request, res: Response) => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
       res.status(400).json({ errors: errors.array() });
       return;
     }
+
+    // Check if user exists
+    const { email } = req.body;
+    const user = await getUser(email);
+
+    if (user._tag === "Failure") {
+      res.status(400).json({ error: user.error });
+      return;
+    }
+
+    // TODO: Check user password
+
+    // TODO: Check if token is active, means user is logged in
+
+    // TODO: If user is not logged in, create token...
 
     console.log("login-stateless", req.body);
     res.send("Hello World Login");
@@ -58,29 +73,58 @@ router.post("/logout-stateful", (req, res) => {
   res.send("Hello World Logout");
 });
 
-router.post("/login-stateful", validateLogin, (req: Request, res: Response) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    res.status(400).json({ errors: errors.array() });
-    return;
-  }
+router.post(
+  "/login-stateful",
+  validateLogin,
+  async (req: Request, res: Response) => {
+    const errors = validationResult(req);
 
-  console.log("login-stateful", req.body);
-  res.send("Hello World Login");
-});
+    if (!errors.isEmpty()) {
+      res.status(400).json({ errors: errors.array() });
+      return;
+    }
+
+    // Check if user exists
+    const { email } = req.body;
+    const user = await getUser(email);
+
+    if (user._tag === "Failure") {
+      res.status(400).json({ error: user.error });
+      return;
+    }
+
+    // TODO: Check user password
+
+    // TODO: Check if session is active, means user is logged in
+
+    // TODO: If user is not logged in, create session...
+
+    res.send("Hello World Login");
+  }
+);
 
 router.post(
   "/register-stateful",
   validateRegister,
-  (req: Request, res: Response) => {
+  async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       res.status(400).json({ errors: errors.array() });
       return;
     }
 
-    console.log("register-stateful", req.body);
-    res.send("Hello World Register");
+    const { email, password } = req.body;
+
+    const result = await createUser({ email, password });
+
+    if (result._tag === "Failure") {
+      res.status(400).json({ error: result.error });
+      return;
+    }
+
+    // TODO: Create session, store session...
+
+    res.status(200).json({ message: result.data });
   }
 );
 

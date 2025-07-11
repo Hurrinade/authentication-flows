@@ -17,7 +17,6 @@ export const createUser = async (
   user: Omit<User, "id">
 ): Promise<Result<string, string>> => {
   try {
-    console.log("Creating user", user);
     await prisma.user.create({
       data: {
         email: user.email,

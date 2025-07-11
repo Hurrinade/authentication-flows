@@ -4,6 +4,7 @@ This is a full-stack authentication demonstration project built with modern web 
 
 # 🚧 STILL IN WORK
 
+- whole frontend
 - authentications
 - final prisma models
 - production build and dockerization
