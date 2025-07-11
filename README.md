@@ -2,6 +2,12 @@
 
 This is a full-stack authentication demonstration project built with modern web technologies. The application showcases both stateless (JWT-based) and stateful (session-based) authentication patterns, providing developers with practical examples of different authentication strategies.
 
+# 🚧 STILL IN WORK
+
+- authentications
+- final prisma models
+- production build and dockerization
+
 ## Tech Stack
 
 ### Frontend
