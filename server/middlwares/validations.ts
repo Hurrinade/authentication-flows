@@ -5,7 +5,7 @@ export const validateLogin = [
   body("password")
     .isLength({ min: 8 })
     .withMessage("Password must be at least 8 characters long"),
-  body("mode").isIn(["stateless_simple", "stateless_refresh", "statefull"]),
+  body("mode").isIn(["stateless_simple", "hybrid", "statefull"]),
 ];
 
 export const validateRegister = [
@@ -13,9 +13,9 @@ export const validateRegister = [
   body("password")
     .isLength({ min: 8 })
     .withMessage("Password must be at least 8 characters long"),
-  body("mode").isIn(["stateless_simple", "stateless_refresh", "statefull"]),
+  body("mode").isIn(["stateless_simple", "hybrid", "statefull"]),
 ];
 
 export const validateLogout = [
-  body("mode").isIn(["stateless_simple", "stateless_refresh", "statefull"]),
+  body("mode").isIn(["stateless_simple", "hybrid", "statefull"]),
 ];

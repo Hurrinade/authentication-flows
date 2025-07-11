@@ -6,7 +6,7 @@ This is a full-stack authentication demonstration project built with modern web 
 
 - whole frontend
 - authentications
-  - stateless (refresh token)
+  - hybrid (refresh token)
   - statefull with session
 - final prisma models
 - production build and dockerization
@@ -20,9 +20,10 @@ This is a full-stack authentication demonstration project built with modern web 
 
 <img src="./images/stateless-simple.png" width="700" height="600" />
 
-2. **Stateless With refresh token**
+2. **Stateless/Statefull With refresh token (Hybrid)**
 
 - this aproach makes this problem less effective as access token has very short time it lives, but new surface of atack is refresh token which is sent now and then to restore access token
+- but as we store that refresh token and access in db they can be revoked and atack can be stoped
 
 3. **Statefull**
 
@@ -53,7 +54,8 @@ Libraries:
 
 ## Features
 
-- **Stateless Authentication**: JWT-based authentication for scalable, distributed applications, with one token and with refresh token
+- **Stateless Authentication**: JWT-based authentication for scalable, distributed application
+- **Hyrbid Authentication**: Using access and refresh token which are stored in db
 - **Stateful Authentication**: Session-based authentication with server-side session management
 - **Type Safety**: Full TypeScript implementation across frontend and backend
 - **Database Integration**: Prisma ORM for efficient database operations

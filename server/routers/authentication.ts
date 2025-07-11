@@ -5,10 +5,13 @@ import {
   validateLogout,
 } from "../middlwares/validations";
 import { LONG_EXPIRE_TIME, SHORT_EXPIRE_TIME } from "../utils/constants";
+import { createToken } from "../utils/tokens";
 import { validationResult } from "express-validator";
 import { createUser, getUser } from "../services/userService";
-import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import { storeTokens } from "../services/tokenService";
+
+// TODO: unitfy login and register token per mode handling (separate into functions)
 
 const router: Router = Router();
 // How complex will the hash be
@@ -37,7 +40,7 @@ router.post("/login", validateLogin, async (req: Request, res: Response) => {
     return;
   }
 
-  if (!process.env.JWT_SECRET) {
+  if (!process.env.JWT_SECRET || !process.env.JWT_ACCESS_SECRET) {
     res.status(500).json({ error: "JWT_SECRET is not set" });
     return;
   }
@@ -53,13 +56,11 @@ router.post("/login", validateLogin, async (req: Request, res: Response) => {
 
   // Handle user login based on mode
   if (req.body.mode === "stateless_simple") {
-    const token = jwt.sign(
-      { email, userId: user.data.id },
+    const token = createToken(
+      { email },
+      user.data.id,
       process.env.JWT_SECRET,
-      {
-        algorithm: "RS256",
-        expiresIn: LONG_EXPIRE_TIME,
-      }
+      LONG_EXPIRE_TIME
     );
 
     return res
@@ -70,8 +71,45 @@ router.post("/login", validateLogin, async (req: Request, res: Response) => {
       })
       .status(200)
       .json({ email: user.data.email, userId: user.data.id });
-  } else if (req.body.mode === "stateless_refresh") {
-    return res.send("Login refresh");
+  } else if (req.body.mode === "hybrid") {
+    // Create refresh token
+    const refreshToken = createToken(
+      { email },
+      user.data.id,
+      process.env.JWT_SECRET,
+      LONG_EXPIRE_TIME
+    );
+
+    // Create access token
+    const accessToken = createToken(
+      { email },
+      user.data.id,
+      process.env.JWT_ACCESS_SECRET,
+      SHORT_EXPIRE_TIME
+    );
+
+    const tokenResult = await storeTokens({
+      accessToken,
+      refreshToken,
+      userId: user.data.id,
+    });
+
+    if (tokenResult._tag === "Failure") {
+      res.status(500).json({ error: tokenResult.error });
+      return;
+    }
+
+    return res
+      .cookie("token", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        maxAge: LONG_EXPIRE_TIME,
+      })
+      .status(200)
+      .json({
+        accessToken,
+        email: user.data.email,
+      });
   }
 
   // Else is statefull
@@ -99,20 +137,19 @@ router.post(
       return;
     }
 
-    if (!process.env.JWT_SECRET) {
-      res.status(500).json({ error: "JWT_SECRET is not set" });
+    if (!process.env.JWT_SECRET || !process.env.JWT_ACCESS_SECRET) {
+      res
+        .status(500)
+        .json({ error: "JWT_SECRET or JWT_ACCESS_SECRET is not set" });
       return;
     }
 
-    // TODO: Create token, ...
     if (req.body.mode === "stateless_simple") {
-      const token = jwt.sign(
-        { email, userId: result.data.id },
+      const token = createToken(
+        { email },
+        result.data.id,
         process.env.JWT_SECRET,
-        {
-          algorithm: "RS256",
-          expiresIn: LONG_EXPIRE_TIME,
-        }
+        LONG_EXPIRE_TIME
       );
 
       return res
@@ -125,12 +162,50 @@ router.post(
           maxAge: LONG_EXPIRE_TIME,
         })
         .status(200)
-        .json({ email: result.data.email, userId: result.data.id });
-    } else if (req.body.mode === "stateless_refresh") {
-      return res.status(200).json({ message: result.data });
+        .json({ email: result.data.email });
+    } else if (req.body.mode === "hybrid") {
+      // Create refresh token
+      const refreshToken = createToken(
+        { email },
+        result.data.id,
+        process.env.JWT_SECRET,
+        LONG_EXPIRE_TIME
+      );
+
+      // Create access token
+      const accessToken = createToken(
+        { email },
+        result.data.id,
+        process.env.JWT_ACCESS_SECRET,
+        SHORT_EXPIRE_TIME
+      );
+
+      const tokenResult = await storeTokens({
+        accessToken,
+        refreshToken,
+        userId: result.data.id,
+      });
+
+      if (tokenResult._tag === "Failure") {
+        res.status(500).json({ error: tokenResult.error });
+        return;
+      }
+
+      return res
+        .cookie("token", refreshToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          maxAge: LONG_EXPIRE_TIME,
+        })
+        .status(200)
+        .json({
+          accessToken,
+          email: result.data.email,
+        });
     }
 
     // Else is statefull
+    // TODO: Statefull session
     return res.status(200).json({ message: result.data });
   }
 );
@@ -146,7 +221,7 @@ router.post("/logout", validateLogout, (req: Request, res: Response) => {
   // If it is only simple mode for logout just delete cookie
   if (req.body.mode === "stateless_simple") {
     return res.clearCookie("token").status(200).json({ message: "Logged out" });
-  } else if (req.body.mode === "stateless_refresh") {
+  } else if (req.body.mode === "hybrid") {
     return res.status(200).json({ message: "Logged out" });
   }
 
