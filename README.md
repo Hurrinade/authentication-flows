@@ -1,11 +1,13 @@
 # Project description
 
-This is a full-stack authentication demonstration project built with modern web technologies. The application showcases both stateless (JWT-based) and stateful (session-based) authentication patterns, providing developers with practical examples of different authentication strategies.
+This is a full-stack authentication demonstration project built with modern web technologies. The application showcases both stateless (JWT-based) and stateful (session-based) authentication patterns, providing developers with practical examples of different authentication strategies. Also it uses secure way of storing passwords with salt and hash.
 
 # 🚧 STILL IN WORK
 
 - whole frontend
 - authentications
+  - statefull (simple and with refresh token)
+  - stateless with session
 - final prisma models
 - production build and dockerization
 
@@ -21,19 +23,22 @@ This is a full-stack authentication demonstration project built with modern web 
 - **Node.js** - JavaScript runtime for server-side development
 - **Express.js** - Fast and minimalist web framework
 - **TypeScript** - Type-safe server-side development
+- **Prisma/Postgres** - ORM and database
 
-### Database
+Libraries:
 
-- **Prisma** - Modern database toolkit and ORM for type-safe database access
+- cookie-parser - for parsing cookies
+- jsonwebtoken - for tokens
+- bycrypt - for salting
 
 ### Infrastructure
 
-- **Docker** - Containerization for consistent development and deployment
-- **Docker Compose** - Multi-container orchestration for easy setup
+- **Docker** - Containerization for consistent development and deployment`
+- **Docker Compose** - Multi-container orchestration for easy setup`
 
 ## Features
 
-- **Stateless Authentication**: JWT-based authentication for scalable, distributed applications
+- **Stateless Authentication**: JWT-based authentication for scalable, distributed applications, with one token and with refresh token
 - **Stateful Authentication**: Session-based authentication with server-side session management
 - **Type Safety**: Full TypeScript implementation across frontend and backend
 - **Database Integration**: Prisma ORM for efficient database operations
@@ -64,6 +69,8 @@ POSTGRES_PASSWORD=examplepassword
 POSTGRES_USER=exampleuser
 # Custom database
 POSTGRES_DB=authentications
+# jwt secret which is used to sign jwt token, generate your own
+JWT_SECRET=some_secret
 
 # production
 PORT=8080
@@ -90,3 +97,10 @@ To access db from outside run on your host machine
 ```bash
 psql postgres://exampleuser:examplepassword@localhost:5430/authentications
 ```
+
+### **Usage**
+
+- Three modes:
+  - "stateless_simple" - only long lasting token which is sent via cookie and checked on each request
+  - "stateless_refresh" - refresh and access (short lived token)
+  - "statefull" - session

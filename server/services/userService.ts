@@ -15,16 +15,16 @@ import { Result, ok, err } from "../types/return";
 // Create new user
 export const createUser = async (
   user: Omit<User, "id">
-): Promise<Result<string, string>> => {
+): Promise<Result<User, string>> => {
   try {
-    await prisma.user.create({
+    const newUser = await prisma.user.create({
       data: {
         email: user.email,
-        password: user.password, // TODO: hash password
+        password: user.password,
       },
     });
 
-    return ok("User created successfully");
+    return ok(newUser);
   } catch (error) {
     console.error(error);
     return err("User creation failed");
