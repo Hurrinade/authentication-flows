@@ -45,8 +45,18 @@ Content:
 
 ```bash
 # development
+# Server port
 PORT=3000
+# Server env
 NODE_ENV=development
+# Local dockerized db url
+DATABASE_URL="postgres://exampleuser:examplepassword@database:5432/authentications"
+# Custom db password
+POSTGRES_PASSWORD=examplepassword
+# Custom db user
+POSTGRES_USER=exampleuser
+# Custom database
+POSTGRES_DB=authentications
 
 # production
 PORT=8080
@@ -59,4 +69,17 @@ NODE_ENV=production
 docker compose up -d
 ```
 
-- development server is run with nodemon
+### Database
+
+- database is postgres
+- docker will automatically create db migration on initial start to setup all models
+
+**NOTICE**
+
+- database will be reset each time docker compose is run this is intentional and for test/showcase purposes only
+
+To access db from outside run on your host machine
+
+```bash
+psql postgres://exampleuser:examplepassword@localhost:5430/authentications
+```
