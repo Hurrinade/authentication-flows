@@ -1,5 +1,10 @@
 import { Router, Request, Response } from "express";
-import { validateLogin, validateRegister } from "../middlwares/validations";
+import {
+  validateLogin,
+  validateRegister,
+  validateLogout,
+} from "../middlwares/validations";
+import { LONG_EXPIRE_TIME, SHORT_EXPIRE_TIME } from "../utils/constants";
 import { validationResult } from "express-validator";
 import { createUser, getUser } from "../services/userService";
 import jwt from "jsonwebtoken";
@@ -50,14 +55,18 @@ router.post("/login", validateLogin, async (req: Request, res: Response) => {
   if (req.body.mode === "stateless_simple") {
     const token = jwt.sign(
       { email, userId: user.data.id },
-      process.env.JWT_SECRET
+      process.env.JWT_SECRET,
+      {
+        algorithm: "RS256",
+        expiresIn: LONG_EXPIRE_TIME,
+      }
     );
 
     return res
       .cookie("token", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        maxAge: 1000 * 60 * 60 * 24 * 30,
+        maxAge: LONG_EXPIRE_TIME,
       })
       .status(200)
       .json({ email: user.data.email, userId: user.data.id });
@@ -99,7 +108,11 @@ router.post(
     if (req.body.mode === "stateless_simple") {
       const token = jwt.sign(
         { email, userId: result.data.id },
-        process.env.JWT_SECRET
+        process.env.JWT_SECRET,
+        {
+          algorithm: "RS256",
+          expiresIn: LONG_EXPIRE_TIME,
+        }
       );
 
       return res
@@ -109,7 +122,7 @@ router.post(
           // Only send cookie over HTTPS in production
           secure: process.env.NODE_ENV === "production",
           // 30 days
-          maxAge: 1000 * 60 * 60 * 24 * 30,
+          maxAge: LONG_EXPIRE_TIME,
         })
         .status(200)
         .json({ email: result.data.email, userId: result.data.id });
@@ -123,9 +136,22 @@ router.post(
 );
 
 // Handle stateful authentication
-router.post("/logout", (req, res) => {
-  console.log("logout-stateful", req.body);
-  res.send("Hello World Logout");
+router.post("/logout", validateLogout, (req: Request, res: Response) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.status(400).json({ errors: errors.array() });
+    return;
+  }
+
+  // If it is only simple mode for logout just delete cookie
+  if (req.body.mode === "stateless_simple") {
+    return res.clearCookie("token").status(200).json({ message: "Logged out" });
+  } else if (req.body.mode === "stateless_refresh") {
+    return res.status(200).json({ message: "Logged out" });
+  }
+
+  // Else is statefull
+  return res.status(200).json({ message: "Logged out" });
 });
 
 export default router;

@@ -6,8 +6,8 @@ This is a full-stack authentication demonstration project built with modern web 
 
 - whole frontend
 - authentications
-  - statefull (simple and with refresh token)
-  - stateless with session
+  - stateless (refresh token)
+  - statefull with session
 - final prisma models
 - production build and dockerization
 
@@ -15,9 +15,15 @@ This is a full-stack authentication demonstration project built with modern web 
 
 1. **Statless basic**
 
+- this is very simple aproach which serves its purpose and protects resources, but it has a problem and that is what if someone steals a token? He can access all of the data he needs and there is no way to stop him from doing it until token he has expires
+- logout here is just deleting token from the cookie, but if someone else has it it does not matter
+
 <img src="./images/stateless-simple.png" width="700" height="600" />
 
 2. **Stateless With refresh token**
+
+- this aproach makes this problem less effective as access token has very short time it lives, but new surface of atack is refresh token which is sent now and then to restore access token
+
 3. **Statefull**
 
 ## Tech Stack
