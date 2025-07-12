@@ -5,11 +5,12 @@ import {
   validateLogout,
 } from "../middlwares/validations";
 import { LONG_EXPIRE_TIME, SHORT_EXPIRE_TIME } from "../utils/constants";
-import { createToken } from "../utils/tokens";
+import { createToken, createTokens } from "../utils/tokens";
 import { validationResult } from "express-validator";
 import { createUser, getUser } from "../services/userService";
 import bcrypt from "bcrypt";
-import { storeTokens } from "../services/tokenService";
+import { storeTokens, updateToken } from "../services/tokenService";
+import { reissueAccessToken } from "../utils/tokens";
 
 // TODO: unitfy login and register token per mode handling (separate into functions)
 
@@ -27,6 +28,7 @@ router.post("/login", validateLogin, async (req: Request, res: Response) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
+    console.error("<authentication.ts>(login)[ERROR] Validation failed");
     res.status(400).json({ errors: errors.array() });
     return;
   }
@@ -36,11 +38,13 @@ router.post("/login", validateLogin, async (req: Request, res: Response) => {
   const user = await getUser(email);
 
   if (user._tag === "Failure") {
+    console.error("<authentication.ts>(login)[ERROR] User not found");
     res.status(400).json({ error: user.error });
     return;
   }
 
   if (!process.env.JWT_SECRET || !process.env.JWT_ACCESS_SECRET) {
+    console.error("<authentication.ts>(login)[ERROR] JWT_SECRET is not set");
     res.status(500).json({ error: "JWT_SECRET is not set" });
     return;
   }
@@ -50,6 +54,7 @@ router.post("/login", validateLogin, async (req: Request, res: Response) => {
   const isPasswordValid = await bcrypt.compare(password, hashedPassword);
 
   if (!isPasswordValid) {
+    console.error("<authentication.ts>(login)[ERROR] Invalid password");
     res.status(400).json({ error: "Invalid password" });
     return;
   }
@@ -72,29 +77,17 @@ router.post("/login", validateLogin, async (req: Request, res: Response) => {
       .status(200)
       .json({ email: user.data.email, userId: user.data.id });
   } else if (req.body.mode === "hybrid") {
-    // Create refresh token
-    const refreshToken = createToken(
-      { email },
-      user.data.id,
-      process.env.JWT_SECRET,
-      LONG_EXPIRE_TIME
-    );
+    // Create tokens
+    const { refreshToken, accessToken } = createTokens(user.data.id, { email });
 
-    // Create access token
-    const accessToken = createToken(
-      { email },
-      user.data.id,
-      process.env.JWT_ACCESS_SECRET,
-      SHORT_EXPIRE_TIME
-    );
-
-    const tokenResult = await storeTokens({
-      accessToken,
+    // Update tokens
+    const tokenResult = await updateToken({
       refreshToken,
       userId: user.data.id,
     });
 
     if (tokenResult._tag === "Failure") {
+      console.error("<authentication.ts>(login)[ERROR] Token storing failed");
       res.status(500).json({ error: tokenResult.error });
       return;
     }
@@ -122,6 +115,7 @@ router.post(
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.error("<authentication.ts>(register)[ERROR] Validation failed");
       res.status(400).json({ errors: errors.array() });
       return;
     }
@@ -130,14 +124,20 @@ router.post(
 
     // Salt and hash password
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-    const result = await createUser({ email, password: hashedPassword });
+    const user = await createUser({ email, password: hashedPassword });
 
-    if (result._tag === "Failure") {
-      res.status(400).json({ error: result.error });
+    if (user._tag === "Failure") {
+      console.error(
+        "<authentication.ts>(register)[ERROR] User creation failed"
+      );
+      res.status(400).json({ error: user.error });
       return;
     }
 
     if (!process.env.JWT_SECRET || !process.env.JWT_ACCESS_SECRET) {
+      console.error(
+        "<authentication.ts>(register)[ERROR] JWT_SECRET or JWT_ACCESS_SECRET is not set"
+      );
       res
         .status(500)
         .json({ error: "JWT_SECRET or JWT_ACCESS_SECRET is not set" });
@@ -147,7 +147,7 @@ router.post(
     if (req.body.mode === "stateless_simple") {
       const token = createToken(
         { email },
-        result.data.id,
+        user.data.id,
         process.env.JWT_SECRET,
         LONG_EXPIRE_TIME
       );
@@ -162,31 +162,23 @@ router.post(
           maxAge: LONG_EXPIRE_TIME,
         })
         .status(200)
-        .json({ email: result.data.email });
+        .json({ email: user.data.email });
     } else if (req.body.mode === "hybrid") {
-      // Create refresh token
-      const refreshToken = createToken(
-        { email },
-        result.data.id,
-        process.env.JWT_SECRET,
-        LONG_EXPIRE_TIME
-      );
+      // Create tokens
+      const { refreshToken, accessToken } = createTokens(user.data.id, {
+        email,
+      });
 
-      // Create access token
-      const accessToken = createToken(
-        { email },
-        result.data.id,
-        process.env.JWT_ACCESS_SECRET,
-        SHORT_EXPIRE_TIME
-      );
-
+      // Store tokens
       const tokenResult = await storeTokens({
-        accessToken,
         refreshToken,
-        userId: result.data.id,
+        userId: user.data.id,
       });
 
       if (tokenResult._tag === "Failure") {
+        console.error(
+          "<authentication.ts>(register)[ERROR] Token storing failed"
+        );
         res.status(500).json({ error: tokenResult.error });
         return;
       }
@@ -200,13 +192,13 @@ router.post(
         .status(200)
         .json({
           accessToken,
-          email: result.data.email,
+          email: user.data.email,
         });
     }
 
     // Else is statefull
     // TODO: Statefull session
-    return res.status(200).json({ message: result.data });
+    return res.status(200).json({ message: user.data });
   }
 );
 
@@ -214,6 +206,7 @@ router.post(
 router.post("/logout", validateLogout, (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    console.error("<authentication.ts>(logout)[ERROR] Validation failed");
     res.status(400).json({ errors: errors.array() });
     return;
   }
@@ -229,4 +222,33 @@ router.post("/logout", validateLogout, (req: Request, res: Response) => {
   return res.status(200).json({ message: "Logged out" });
 });
 
+router.post("/refresh", async (req: Request, res: Response) => {
+  try {
+    const refreshToken = req.cookies["token"];
+    const result = await reissueAccessToken(refreshToken);
+
+    if (result._tag === "Failure") {
+      console.error("<authentication.ts>(refresh)[ERROR] Token reissue failed");
+      return res.clearCookie("token").status(401).json({ error: result.error });
+    }
+
+    return res
+      .cookie("token", result.data.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        maxAge: LONG_EXPIRE_TIME,
+      })
+      .status(200)
+      .json({ accessToken: result.data.accessToken });
+  } catch (error) {
+    console.error("<authentication.ts>(refresh)[ERROR] Internal server error");
+    return res
+      .clearCookie("token")
+      .status(500)
+      .json({ error: "Internal server error" });
+  }
+});
+
 export default router;
+
+// token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3NTIzMDM0MTIsImV4cCI6NDM0NDMwMzQxMiwiYXVkIjoiY21jenc3aWh4MDAwMHF1NGMwcnJwNXF6diJ9.foS8_U5lnQKoyq2KOhU58zfTV6zGC_Ylj_34ulthqSg; Max-Age=2592000; Path=/; Expires=Mon, 11 Aug 2025 06:56:52 GMT; HttpOnly

@@ -35,7 +35,7 @@ services:
       - /app/prisma # perserve docker generated
       - /app/generated # perserve docker generated
       - /app/node_modules # This is perserved and not overwritten by command above
-    # Run initial prisma migration to create the database and start the server
+    # Reset whole database and Run initial prisma migration to create the database and start the server
     command: sh -c "npx prisma migrate reset --force && npx prisma migrate dev --name init && pnpm run dev"
 
   # Production server

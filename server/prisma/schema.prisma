@@ -17,6 +17,6 @@ model User {
 
 model UserToken {
   id String @id
-  accessToken String
   refreshToken String
+  createdAt DateTime @default(now())
 }

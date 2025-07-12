@@ -22,8 +22,9 @@ This is a full-stack authentication demonstration project built with modern web 
 
 2. **Stateless/Statefull With refresh token (Hybrid)**
 
-- this aproach makes this problem less effective as access token has very short time it lives, but new surface of atack is refresh token which is sent now and then to restore access token
-- but as we store that refresh token and access in db they can be revoked and atack can be stoped
+- this aproach makes this problem less effective as access token has very short time it lives, but problem still exists
+- but as we store that refresh token in db they can be revoked and attack can be stoped
+- also refreshing refresh token when creating new access token also is good practice as it invalids any old tokens (**refresh token rotation**)
 
 3. **Statefull**
 
