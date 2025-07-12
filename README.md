@@ -25,6 +25,7 @@ This is a full-stack authentication demonstration project built with modern web 
 - this aproach makes this problem less effective as access token has very short time it lives, but problem still exists
 - but as we store that refresh token in db they can be revoked and attack can be stoped
 - also refreshing refresh token when creating new access token also is good practice as it invalids any old tokens (**refresh token rotation**)
+- this is a bit expensive as database needs to be accessed frequently, also unlike sessions takes a lot of stuff to check if it is valid etc..
 
 <img src="./images/hybrid.png" width="700" height="600" />
 
@@ -32,6 +33,9 @@ This is a full-stack authentication demonstration project built with modern web 
 
 - using express-sessions, when user sends initial request session is created and saved in memory (upgrade would be to use something like redis), and returend to client via cookie, each time user sends new request that session is sent and checked with memory storage, session can be updated on requests where in memory it also gets updated, when session gets destroyed user is protected as his session is not anymore in store and cannot be used for anything
 - to protect routes some userId or something needs to be stored in session which is then checked on protected endpoints
+- unlike token storing this uses memory and is much faster
+
+<img src="./images/session.png" width="700" height="600" />
 
 ## Tech Stack
 
