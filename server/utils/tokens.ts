@@ -37,22 +37,20 @@ export function createTokens(userId: string, data: Record<string, any>) {
   };
 }
 
-export function verifyToken(token: string): Result<string, string> {
+export function verifyToken(token: string): Result<JwtPayload, string> {
   try {
     if (!process.env.JWT_SECRET) {
       return err("JWT_SECRET is not set");
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = (decoded as JwtPayload).aud as string;
 
-    return ok(userId);
+    return ok(decoded as JwtPayload);
   } catch (error) {
     return err("Invalid token");
   }
 }
 
-// TODO: upgrade to check db
 export async function reissueAccessToken(
   refreshToken: string
 ): Promise<Result<{ accessToken: string; refreshToken: string }, string>> {
