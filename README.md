@@ -26,6 +26,8 @@ This is a full-stack authentication demonstration project built with modern web 
 - but as we store that refresh token in db they can be revoked and attack can be stoped
 - also refreshing refresh token when creating new access token also is good practice as it invalids any old tokens (**refresh token rotation**)
 
+<img src="./images/hybrid.png" width="700" height="600" />
+
 3. **Statefull**
 
 ## Tech Stack
