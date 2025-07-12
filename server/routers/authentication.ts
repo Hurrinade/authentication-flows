@@ -293,6 +293,19 @@ router.post("/refresh", async (req: Request, res: Response) => {
   }
 });
 
-export default router;
+router.get("/check-session", async (req: Request, res: Response) => {
+  if ((req.session as any).userId) {
+    // Get user from db
+    const user = await getUser((req.session as any).email);
 
-// token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3NTIzMDM0MTIsImV4cCI6NDM0NDMwMzQxMiwiYXVkIjoiY21jenc3aWh4MDAwMHF1NGMwcnJwNXF6diJ9.foS8_U5lnQKoyq2KOhU58zfTV6zGC_Ylj_34ulthqSg; Max-Age=2592000; Path=/; Expires=Mon, 11 Aug 2025 06:56:52 GMT; HttpOnly
+    if (user._tag === "Failure") {
+      return res.status(401).json({ error: user.error });
+    }
+
+    const { password, ...userData } = user.data;
+    return res.status(200).json({ message: "User logged in", user: userData });
+  }
+  return res.status(401).json({ error: "Unauthorized" });
+});
+
+export default router;
