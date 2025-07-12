@@ -4,8 +4,8 @@ import {
   validateRegister,
   validateLogout,
 } from "../middlwares/validations";
-import { LONG_EXPIRE_TIME, SHORT_EXPIRE_TIME } from "../utils/constants";
-import { createToken, createTokens } from "../utils/tokens";
+import { LONG_EXPIRE_TIME } from "../utils/constants";
+import { createToken, createTokens, verifyToken } from "../utils/tokens";
 import { validationResult } from "express-validator";
 import { createUser, getUser } from "../services/userService";
 import bcrypt from "bcrypt";
@@ -203,7 +203,7 @@ router.post(
 );
 
 // Handle stateful authentication
-router.post("/logout", validateLogout, (req: Request, res: Response) => {
+router.post("/logout", validateLogout, async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     console.error("<authentication.ts>(logout)[ERROR] Validation failed");
@@ -215,7 +215,29 @@ router.post("/logout", validateLogout, (req: Request, res: Response) => {
   if (req.body.mode === "stateless_simple") {
     return res.clearCookie("token").status(200).json({ message: "Logged out" });
   } else if (req.body.mode === "hybrid") {
-    return res.status(200).json({ message: "Logged out" });
+    const refreshToken = req.cookies["token"];
+    const userIdResult = verifyToken(refreshToken);
+
+    if (userIdResult._tag === "Failure") {
+      console.error("<authentication.ts>(logout)[ERROR] Invalid token");
+      res.status(401).json({ error: userIdResult.error });
+      return;
+    }
+
+    const userId = userIdResult.data;
+
+    const tokenResult = await updateToken({
+      refreshToken: "",
+      userId,
+    });
+
+    if (tokenResult._tag === "Failure") {
+      console.error("<authentication.ts>(logout)[ERROR] Token update failed");
+      res.status(500).json({ error: tokenResult.error });
+      return;
+    }
+
+    return res.clearCookie("token").status(200).json({ message: "Logged out" });
   }
 
   // Else is statefull
