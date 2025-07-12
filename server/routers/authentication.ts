@@ -104,9 +104,14 @@ router.post("/login", validateLogin, async (req: Request, res: Response) => {
         email: user.data.email,
       });
   }
+  // Statefull with session
+  (req.session as any).userId = user.data.id;
+  (req.session as any).email = user.data.email;
 
-  // Else is statefull
-  return res.send("Login statefull");
+  return res.status(200).json({
+    email: user.data.email,
+    message: "Login statefull",
+  });
 });
 
 router.post(
@@ -196,9 +201,14 @@ router.post(
         });
     }
 
-    // Else is statefull
-    // TODO: Statefull session
-    return res.status(200).json({ message: user.data });
+    // Statefull with session
+    (req.session as any).userId = user.data.id;
+    (req.session as any).email = user.data.email;
+
+    return res.status(200).json({
+      email: user.data.email,
+      message: "Register statefull",
+    });
   }
 );
 
@@ -240,7 +250,16 @@ router.post("/logout", validateLogout, async (req: Request, res: Response) => {
     return res.clearCookie("token").status(200).json({ message: "Logged out" });
   }
 
-  // Else is statefull
+  // Statefull with session
+  req.session.destroy((err) => {
+    if (err) {
+      console.error(
+        "<authentication.ts>(logout)[ERROR] Session destruction failed"
+      );
+      res.status(500).json({ error: err.message });
+      return;
+    }
+  });
   return res.status(200).json({ message: "Logged out" });
 });
 

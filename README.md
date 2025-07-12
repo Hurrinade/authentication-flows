@@ -30,6 +30,9 @@ This is a full-stack authentication demonstration project built with modern web 
 
 3. **Statefull**
 
+- using express-sessions, when user sends initial request session is created and saved in memory (upgrade would be to use something like redis), and returend to client via cookie, each time user sends new request that session is sent and checked with memory storage, session can be updated on requests where in memory it also gets updated, when session gets destroyed user is protected as his session is not anymore in store and cannot be used for anything
+- to protect routes some userId or something needs to be stored in session which is then checked on protected endpoints
+
 ## Tech Stack
 
 ### Frontend

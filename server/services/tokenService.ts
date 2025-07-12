@@ -10,7 +10,7 @@ export const storeTokens = async (data: {
     await prisma.userToken.create({
       data: {
         refreshToken: data.refreshToken,
-        id: data.userId,
+        uid: data.userId,
       },
     });
 
@@ -27,7 +27,7 @@ export const updateToken = async (data: {
 }): Promise<Result<string, string>> => {
   try {
     await prisma.userToken.update({
-      where: { id: data.userId },
+      where: { uid: data.userId },
       data: {
         refreshToken: data.refreshToken,
       },
@@ -45,7 +45,7 @@ export const getUserToken = async (
 ): Promise<Result<UserToken, string>> => {
   try {
     const token = await prisma.userToken.findUnique({
-      where: { id: userId },
+      where: { uid: userId },
     });
 
     if (!token) {
