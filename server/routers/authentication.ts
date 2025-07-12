@@ -256,11 +256,14 @@ router.post("/logout", validateLogout, async (req: Request, res: Response) => {
       console.error(
         "<authentication.ts>(logout)[ERROR] Session destruction failed"
       );
-      res.status(500).json({ error: err.message });
-      return;
+      return res.status(500).json({ error: err.message });
     }
+
+    return res
+      .clearCookie("connect.sid")
+      .status(200)
+      .json({ message: "Logged out" });
   });
-  return res.status(200).json({ message: "Logged out" });
 });
 
 router.post("/refresh", async (req: Request, res: Response) => {
