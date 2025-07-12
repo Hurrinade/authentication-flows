@@ -5,9 +5,6 @@ This is a full-stack authentication demonstration project built with modern web 
 # 🚧 STILL IN WORK
 
 - whole frontend
-- authentications
-  - hybrid (refresh token)
-  - statefull with session
 - final prisma models
 - production build and dockerization
 
