@@ -1,6 +1,16 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+
 export default function Home() {
+  const router = useRouter();
+
+  const handleClick = (path: string) => {
+    router.push(path);
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-8">
+    <div className="min-h-screen flex items-center justify-center p-8">
       <div className="max-w-4xl w-full">
         {/* Header */}
         <div className="text-center mb-16">
@@ -15,7 +25,10 @@ export default function Home() {
         {/* Buttons Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
           {/* Simple JWT Button */}
-          <button className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 p-8 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl">
+          <button
+            className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 p-8 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl"
+            onClick={() => handleClick("/simple-jwt")}
+          >
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
             <div className="relative z-10">
               <div className="flex items-center justify-center mb-4">
@@ -45,7 +58,10 @@ export default function Home() {
           </button>
 
           {/* Refresh Access Button */}
-          <button className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 p-8 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl">
+          <button
+            className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 p-8 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl"
+            onClick={() => handleClick("/refresh-access")}
+          >
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
             <div className="relative z-10">
               <div className="flex items-center justify-center mb-4">
@@ -75,7 +91,10 @@ export default function Home() {
           </button>
 
           {/* Session Button */}
-          <button className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 p-8 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl">
+          <button
+            className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 p-8 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl"
+            onClick={() => handleClick("/session")}
+          >
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
             <div className="relative z-10">
               <div className="flex items-center justify-center mb-4">
