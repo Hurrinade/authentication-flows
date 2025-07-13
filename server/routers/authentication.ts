@@ -251,7 +251,8 @@ router.post("/logout", validateLogout, async (req: Request, res: Response) => {
       return;
     }
 
-    return res.clearCookie("token").status(200).json({ message: "Logged out" });
+    res.clearCookie("token").status(200).json({ message: "Logged out" });
+    return;
   }
 
   // Statefull with session
@@ -268,6 +269,8 @@ router.post("/logout", validateLogout, async (req: Request, res: Response) => {
       .status(200)
       .json({ message: "Logged out" });
   });
+
+  return;
 });
 
 router.post("/refresh", async (req: Request, res: Response) => {
