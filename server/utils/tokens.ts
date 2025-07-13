@@ -7,7 +7,7 @@ export function createToken(
   data: any,
   userId: string,
   jwtSecret: string,
-  expireTime: number
+  expireTime: number,
 ) {
   return jwt.sign(data, jwtSecret, {
     expiresIn: expireTime,
@@ -20,7 +20,7 @@ export function createTokens(userId: string, data: Record<string, any>) {
     {},
     userId,
     process.env.JWT_SECRET!,
-    LONG_EXPIRE_TIME
+    LONG_EXPIRE_TIME,
   );
 
   // Create access token
@@ -28,7 +28,7 @@ export function createTokens(userId: string, data: Record<string, any>) {
     data,
     userId,
     process.env.JWT_ACCESS_SECRET!,
-    SHORT_EXPIRE_TIME
+    SHORT_EXPIRE_TIME,
   );
 
   return {
@@ -52,11 +52,11 @@ export function verifyToken(token: string): Result<JwtPayload, string> {
 }
 
 export async function reissueAccessToken(
-  refreshToken: string
+  refreshToken: string,
 ): Promise<Result<{ accessToken: string; refreshToken: string }, string>> {
   if (!process.env.JWT_SECRET || !process.env.JWT_ACCESS_SECRET) {
     console.error(
-      "<tokens.ts>(reissueAccessToken)[ERROR] JWT_SECRET or JWT_ACCESS_SECRET is not set"
+      "<tokens.ts>(reissueAccessToken)[ERROR] JWT_SECRET or JWT_ACCESS_SECRET is not set",
     );
     return err("JWT_SECRET or JWT_ACCESS_SECRET is not set");
   }
@@ -69,7 +69,7 @@ export async function reissueAccessToken(
     // If aud is missing token is invalid
     if (!userId) {
       console.error(
-        "<tokens.ts>(reissueAccessToken)[ERROR] User ID is missing from aud"
+        "<tokens.ts>(reissueAccessToken)[ERROR] User ID is missing from aud",
       );
       return err("Token invalid");
     }
@@ -79,14 +79,14 @@ export async function reissueAccessToken(
     // If there is internal error or token is not found token is invalid
     if (userToken._tag === "Failure") {
       console.error(
-        "<tokens.ts>(reissueAccessToken)[ERROR] User token not found"
+        "<tokens.ts>(reissueAccessToken)[ERROR] User token not found",
       );
       return err("Token invalid");
     }
     // If token is not the same as the one in db token is invalid
     if (userToken.data.refreshToken !== refreshToken) {
       console.error(
-        "<tokens.ts>(reissueAccessToken)[ERROR] User token is not the same as the one in db"
+        "<tokens.ts>(reissueAccessToken)[ERROR] User token is not the same as the one in db",
       );
       return err("Token invalid");
     }
@@ -105,7 +105,7 @@ export async function reissueAccessToken(
 
     if (storeResult._tag === "Failure") {
       console.error(
-        "<tokens.ts>(reissueAccessToken)[ERROR] Token storing failed"
+        "<tokens.ts>(reissueAccessToken)[ERROR] Token storing failed",
       );
       return err("Token storing failed");
     }
@@ -118,7 +118,7 @@ export async function reissueAccessToken(
   } catch (error) {
     console.error(
       "<tokens.ts>(reissueAccessToken)[ERROR] Invalid refresh token",
-      error
+      error,
     );
     return err("Invalid refresh token");
   }

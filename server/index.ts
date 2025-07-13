@@ -27,7 +27,7 @@ app.use(
     },
     resave: true,
     saveUninitialized: false,
-  })
+  }),
 );
 app.use("/api/v1", authRouter);
 

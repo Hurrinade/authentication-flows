@@ -69,7 +69,7 @@ router.post("/login", validateLogin, async (req: Request, res: Response) => {
       { email },
       user.data.id,
       process.env.JWT_SECRET,
-      LONG_EXPIRE_TIME
+      LONG_EXPIRE_TIME,
     );
 
     return res
@@ -137,7 +137,7 @@ router.post(
 
     if (user._tag === "Failure") {
       console.error(
-        "<authentication.ts>(register)[ERROR] User creation failed"
+        "<authentication.ts>(register)[ERROR] User creation failed",
       );
       res.status(400).json({ error: user.error });
       return;
@@ -145,7 +145,7 @@ router.post(
 
     if (!process.env.JWT_SECRET || !process.env.JWT_ACCESS_SECRET) {
       console.error(
-        "<authentication.ts>(register)[ERROR] JWT_SECRET or JWT_ACCESS_SECRET is not set"
+        "<authentication.ts>(register)[ERROR] JWT_SECRET or JWT_ACCESS_SECRET is not set",
       );
       res
         .status(500)
@@ -158,7 +158,7 @@ router.post(
         { email },
         user.data.id,
         process.env.JWT_SECRET,
-        LONG_EXPIRE_TIME
+        LONG_EXPIRE_TIME,
       );
 
       return res
@@ -186,7 +186,7 @@ router.post(
 
       if (tokenResult._tag === "Failure") {
         console.error(
-          "<authentication.ts>(register)[ERROR] Token storing failed"
+          "<authentication.ts>(register)[ERROR] Token storing failed",
         );
         res.status(500).json({ error: tokenResult.error });
         return;
@@ -213,7 +213,7 @@ router.post(
       email: user.data.email,
       message: "Register statefull",
     });
-  }
+  },
 );
 
 // Handle stateful authentication
@@ -259,7 +259,7 @@ router.post("/logout", validateLogout, async (req: Request, res: Response) => {
   req.session.destroy((err) => {
     if (err) {
       console.error(
-        "<authentication.ts>(logout)[ERROR] Session destruction failed"
+        "<authentication.ts>(logout)[ERROR] Session destruction failed",
       );
       return res.status(500).json({ error: err.message });
     }
@@ -312,7 +312,7 @@ router.get("/check-token", async (req: Request, res: Response) => {
   // If there is no user id in the token it is invalid
   if (!result.data.aud) {
     console.error(
-      "<authentication.ts>(check-token)[ERROR] No user id in token"
+      "<authentication.ts>(check-token)[ERROR] No user id in token",
     );
     return res.status(401).json({ error: "Unauthorized" });
   }
