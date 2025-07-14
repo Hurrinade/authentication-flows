@@ -16,7 +16,6 @@ export default function AuthenticationPane({ mode }: { mode: string }) {
   const [activeSection, setActiveSection] = useState<
     "register" | "login" | null
   >(null);
-  const [selectedMode, setSelectedMode] = useState(mode);
 
   const authMutation = useMutation({
     mutationFn: async (authMethod: "register" | "login") => {
@@ -30,7 +29,7 @@ export default function AuthenticationPane({ mode }: { mode: string }) {
           body: JSON.stringify({
             email: userData.email,
             password: userData.password,
-            mode: selectedMode,
+            mode: "stateless_simple",
           }),
         },
       );
@@ -59,10 +58,6 @@ export default function AuthenticationPane({ mode }: { mode: string }) {
     }
   };
 
-  const handleModeChange = (newMode: string) => {
-    setSelectedMode(newMode);
-  };
-
   if (authMutation.isPending) {
     return <div>Loading...</div>;
   }
@@ -78,36 +73,6 @@ export default function AuthenticationPane({ mode }: { mode: string }) {
     >
       <div className="flex items-center justify-between mb-6 flex-shrink-0">
         <h2 className="text-xl font-semibold text-white">Authentication</h2>
-
-        {/* Mode Dropdown */}
-        <div className="relative">
-          <select
-            value={selectedMode}
-            onChange={(e) => handleModeChange(e.target.value)}
-            className="appearance-none bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
-          >
-            <option value="stateless_simple">Stateless Simple</option>
-            <option value="hybrid">Hybrid</option>
-            <option value="statefull">Statefull</option>
-          </select>
-
-          {/* Custom dropdown arrow */}
-          <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-            <svg
-              className="w-4 h-4 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
-          </div>
-        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto">
