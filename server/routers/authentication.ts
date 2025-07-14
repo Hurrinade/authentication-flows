@@ -123,6 +123,7 @@ router.post(
   validateRegister,
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
+    console.log(req, errors);
     if (!errors.isEmpty()) {
       console.error("<authentication.ts>(register)[ERROR] Validation failed");
       res.status(400).json({ errors: errors.array() });
