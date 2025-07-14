@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import session from "express-session";
 import { PrismaClient } from "./generated/prisma";
 import { LONG_EXPIRE_TIME } from "./utils/constants";
+import cors from "cors";
 import "dotenv/config";
 
 // Global prisma client
@@ -12,6 +13,8 @@ export const prisma = new PrismaClient();
 const app = express();
 const port = process.env.PORT || 3001;
 
+// CORS
+app.use(cors());
 // Parse JSON body
 app.use(express.json());
 // Parse cookies
@@ -27,7 +30,7 @@ app.use(
     },
     resave: true,
     saveUninitialized: false,
-  }),
+  })
 );
 app.use("/api/v1", authRouter);
 
