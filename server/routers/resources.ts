@@ -7,9 +7,9 @@ const router: Router = Router();
 router.get("/resources", [checkToken], (_: Request, res: Response) => {
   // Random resources
   const resources = [
-    { id: Math.floor(Math.random() * 100) + 1, name: "Resource 1" },
-    { id: Math.floor(Math.random() * 100) + 1, name: "Resource 2" },
-    { id: Math.floor(Math.random() * 100) + 1, name: "Resource 3" },
+    { id: Math.floor(Math.random() * 100000) + 1, name: "Resource 1" },
+    { id: Math.floor(Math.random() * 100000) + 2, name: "Resource 2" },
+    { id: Math.floor(Math.random() * 100000) + 3, name: "Resource 3" },
   ];
   res.json(resources);
 });
