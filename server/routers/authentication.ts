@@ -328,8 +328,17 @@ router.get(
   }
 );
 
-router.get("/check-token", [checkToken], async (_: Request, res: Response) => {
-  return res.status(200).json({ message: "User is logged in" });
+router.get("/user", [checkToken], async (req: Request, res: Response) => {
+  const token = req.cookies["token"];
+  const payload = jwt.decode(token);
+
+  const result = await getUser((payload as JwtPayload).email as string);
+
+  if (result._tag === "Failure") {
+    return res.status(404).json({ error: "User not found" });
+  }
+
+  return res.status(200).json({ email: result.data.email });
 });
 
 // Check if session is valid

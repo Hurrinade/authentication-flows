@@ -6,8 +6,7 @@ import Resources from "./Resources";
 
 export default function AuthenticationPane({ mode }: { mode: string }) {
   const { addMessage } = useMessages();
-  const { user, setUser } = useUser();
-  const [enableBack, setEnableBack] = useState(false);
+  const { user, setUser, showProtected, setShowProtected } = useUser();
   const [userData, setUserData] = useState<{
     email: string;
     password: string;
@@ -38,7 +37,7 @@ export default function AuthenticationPane({ mode }: { mode: string }) {
       }
 
       const data = await response.json();
-      setEnableBack(true);
+      setShowProtected(true);
       setUser({ email: data.email });
       return data;
     },
@@ -65,7 +64,7 @@ export default function AuthenticationPane({ mode }: { mode: string }) {
 
   const handleLogout = async () => {
     logoutMutation.mutate();
-    setEnableBack(false);
+    setShowProtected(false);
     setUserData({ email: "", password: "" });
     setActiveSection(null);
   };
@@ -96,7 +95,7 @@ export default function AuthenticationPane({ mode }: { mode: string }) {
       </div>
 
       <div className="flex-1 overflow-y-auto">
-        {!enableBack ? (
+        {!showProtected ? (
           <div className="space-y-4">
             {/* Buttons */}
             <div className="grid grid-cols-1 gap-4 mb-6">

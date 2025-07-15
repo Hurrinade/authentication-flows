@@ -11,13 +11,18 @@ interface User {
 interface UserContextType {
   user: User | null;
   setUser: (user: User | null) => void;
+  showProtected: boolean;
+  setShowProtected: (showProtected: boolean) => void;
 }
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [showProtected, setShowProtected] = useState(false);
 
   return (
-    <UserContext.Provider value={{ user, setUser }}>
+    <UserContext.Provider
+      value={{ user, setUser, showProtected, setShowProtected }}
+    >
       {children}
     </UserContext.Provider>
   );

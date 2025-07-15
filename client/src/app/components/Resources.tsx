@@ -3,14 +3,20 @@ import { useQuery } from "@tanstack/react-query";
 export default function Resources() {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["resources"],
-    queryFn: () => fetch("api/v1/resources").then((res) => res.json()),
+    queryFn: async () => {
+      const response = await fetch("api/v1/resources");
+      if (!response.ok) {
+        return { message: "Unauthorized" };
+      }
+      return response.json();
+    },
   });
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
   if (data.message === "Unauthorized") {
-    return <div>Unauthorized</div>;
+    return <div>{data.message}</div>;
   }
 
   return (

@@ -2,8 +2,28 @@
 
 import MessagesPane from "../components/MessagesPane";
 import AuthenticationPane from "../components/AuthenticationPane";
+import { useQuery } from "@tanstack/react-query";
+import { useUser } from "../contexts/UserProvider";
 
 export default function SimpleJWT() {
+  const { setUser, setShowProtected } = useUser();
+  const { isLoading } = useQuery({
+    queryKey: ["user"],
+    queryFn: async () => {
+      const response = await fetch("api/v1/user");
+      if (!response.ok) {
+        setUser(null);
+        return { message: "Unauthorized" };
+      }
+      const data = await response.json();
+      setShowProtected(true);
+      setUser({ email: data.email });
+      return data;
+    },
+  });
+
+  if (isLoading) return <div>Loading...</div>;
+
   return (
     <div className="min-h-screen">
       {/* Header */}
