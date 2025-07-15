@@ -1,5 +1,6 @@
 import express from "express";
 import authRouter from "./routers/authentication";
+import resourcesRouter from "./routers/resources";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import { PrismaClient } from "./generated/prisma";
@@ -14,7 +15,12 @@ const app = express();
 const port = process.env.PORT || 3001;
 
 // CORS
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3001",
+    credentials: true,
+  })
+);
 // Parse JSON body
 app.use(express.json());
 // Parse cookies
@@ -30,9 +36,10 @@ app.use(
     },
     resave: true,
     saveUninitialized: false,
-  }),
+  })
 );
 app.use("/api/v1", authRouter);
+app.use("/api/v1", resourcesRouter);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

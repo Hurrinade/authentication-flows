@@ -15,6 +15,8 @@ import {
   updateToken,
 } from "../services/tokenService";
 import { reissueAccessToken } from "../utils/tokens";
+import { checkToken } from "../middlwares/middlewares";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 // TODO: unitfy login and register token per mode handling (separate into functions)
 
@@ -229,7 +231,7 @@ router.post("/logout", validateLogout, async (req: Request, res: Response) => {
     return res.clearCookie("token").status(200).json({ message: "Logged out" });
   } else if (req.body.mode === "hybrid") {
     const refreshToken = req.cookies["token"];
-    const payloadResult = verifyToken(refreshToken);
+    const payloadResult = verifyToken(refreshToken, process.env.JWT_SECRET!);
 
     if (payloadResult._tag === "Failure") {
       console.error("<authentication.ts>(logout)[ERROR] Invalid token");
@@ -301,35 +303,32 @@ router.post("/refresh", async (req: Request, res: Response) => {
 });
 
 // Check if token is valid
-router.get("/check-token", async (req: Request, res: Response) => {
-  const refreshToken = req.cookies["token"];
-  const result = verifyToken(refreshToken);
-
-  if (result._tag === "Failure") {
-    console.error("<authentication.ts>(check-token)[ERROR] Verify Failed");
-    return res.status(401).json({ error: result.error });
-  }
-
-  // If there is no user id in the token it is invalid
-  if (!result.data.aud) {
-    console.error(
-      "<authentication.ts>(check-token)[ERROR] No user id in token"
+router.get(
+  "/check-refresh-token",
+  [checkToken],
+  async (req: Request, res: Response) => {
+    const refreshToken = req.cookies["token"];
+    // Just decode no need to verify because middleware already did it
+    const payload = jwt.decode(refreshToken);
+    const dbRefreshToken = await getUserToken(
+      (payload as JwtPayload).aud as string
     );
-    return res.status(401).json({ error: "Unauthorized" });
+
+    if (dbRefreshToken._tag === "Failure") {
+      console.error("<authentication.ts>(check-token)[ERROR] Token not found");
+      return res.status(401).json({ error: dbRefreshToken.error });
+    }
+
+    if (dbRefreshToken.data.refreshToken !== refreshToken) {
+      console.error("<authentication.ts>(check-token)[ERROR] Token mismatch");
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    return res.status(200).json({ message: "User is logged in" });
   }
+);
 
-  const dbRefreshToken = await getUserToken(result.data.aud as string);
-
-  if (dbRefreshToken._tag === "Failure") {
-    console.error("<authentication.ts>(check-token)[ERROR] Token not found");
-    return res.status(401).json({ error: dbRefreshToken.error });
-  }
-
-  if (dbRefreshToken.data.refreshToken !== refreshToken) {
-    console.error("<authentication.ts>(check-token)[ERROR] Token mismatch");
-    return res.status(401).json({ error: "Unauthorized" });
-  }
-
+router.get("/check-token", [checkToken], async (_: Request, res: Response) => {
   return res.status(200).json({ message: "User is logged in" });
 });
 
