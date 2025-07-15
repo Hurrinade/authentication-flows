@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMessages } from "../contexts/MessagesProvider";
+import { useUser } from "../contexts/UserProvider";
 
 export default function Resources({
   resourcesRoute,
@@ -7,10 +8,15 @@ export default function Resources({
   resourcesRoute: string;
 }) {
   const { addMessage } = useMessages();
+  const { accessToken } = useUser();
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["resources"],
     queryFn: async () => {
-      const response = await fetch(`api/v1/${resourcesRoute}`);
+      const response = await fetch(`api/v1/${resourcesRoute}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
       const data = await response.json();
 
       if (data.error) {

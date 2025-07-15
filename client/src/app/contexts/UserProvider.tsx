@@ -13,15 +13,25 @@ interface UserContextType {
   setUser: (user: User | null) => void;
   showProtected: boolean;
   setShowProtected: (showProtected: boolean) => void;
+  accessToken: string | null;
+  setAccessToken: (accessToken: string | null) => void;
 }
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [showProtected, setShowProtected] = useState(false);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
 
   return (
     <UserContext.Provider
-      value={{ user, setUser, showProtected, setShowProtected }}
+      value={{
+        user,
+        setUser,
+        showProtected,
+        setShowProtected,
+        accessToken,
+        setAccessToken,
+      }}
     >
       {children}
     </UserContext.Provider>

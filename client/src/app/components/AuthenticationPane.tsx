@@ -237,7 +237,11 @@ export default function AuthenticationPane({ mode }: { mode: string }) {
               </h4>
               <Resources
                 resourcesRoute={
-                  mode === "statefull" ? "session-resources" : "resources"
+                  mode === "statefull"
+                    ? "session-resources"
+                    : mode === "hybrid"
+                      ? "hybrid-resources"
+                      : "resources"
                 }
               />
             </div>

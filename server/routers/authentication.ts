@@ -385,6 +385,51 @@ router.get("/user", [checkToken], async (req: Request, res: Response) => {
     .json({ data: { email: result.data.email }, error: false });
 });
 
+// Initial fetch to check if user is logged in (hybrid)
+router.get(
+  "/hybrid-user",
+  [checkToken],
+  async (req: Request, res: Response) => {
+    const refreshToken = req.cookies["token"];
+    const result = await reissueAccessToken(refreshToken);
+
+    if (result._tag === "Failure") {
+      console.error(
+        "<authentication.ts>(hybrid-user)[ERROR] Token reissue failed"
+      );
+      return res
+        .clearCookie("token")
+        .status(401)
+        .json({ data: "(hybrid-user) Token reissue failed", error: true });
+    }
+
+    const payload = jwt.decode(result.data.refreshToken);
+    const userResult = await getUser((payload as JwtPayload).email as string);
+
+    if (userResult._tag === "Failure") {
+      console.error("<authentication.ts>(hybrid-user)[ERROR] User not found");
+      return res
+        .status(404)
+        .json({ data: "(hybrid-user) User not found", error: true });
+    }
+
+    return res
+      .cookie("token", result.data.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        maxAge: LONG_EXPIRE_TIME,
+      })
+      .status(200)
+      .json({
+        data: {
+          email: userResult.data.email,
+          accessToken: result.data.accessToken,
+        },
+        error: false,
+      });
+  }
+);
+
 // Check if session is valid
 router.get(
   "/session-user",

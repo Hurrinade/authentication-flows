@@ -17,7 +17,7 @@ export function createToken(
 
 export function createTokens(userId: string, data: Record<string, any>) {
   const refreshToken = createToken(
-    {},
+    data,
     userId,
     process.env.JWT_SECRET!,
     LONG_EXPIRE_TIME
