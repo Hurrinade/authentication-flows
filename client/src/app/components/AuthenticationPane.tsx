@@ -33,12 +33,14 @@ export default function AuthenticationPane({ mode }: { mode: string }) {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to register");
+        addMessage(`Failed to ${authMethod}`, "error");
+        return { message: "Failed to register" };
       }
 
       const data = await response.json();
       setShowProtected(true);
       setUser({ email: data.email });
+      addMessage(`User ${authMethod} success`, "success");
       return data;
     },
   });
@@ -55,9 +57,11 @@ export default function AuthenticationPane({ mode }: { mode: string }) {
         }),
       });
       if (!response.ok) {
-        throw new Error("Failed to logout");
+        addMessage("Failed to logout", "error");
+        return { message: "Failed to logout" };
       }
       setUser(null);
+      addMessage("User logged out", "success");
       return;
     },
   });

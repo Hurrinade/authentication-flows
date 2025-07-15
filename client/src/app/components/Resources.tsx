@@ -1,13 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
+import { useMessages } from "../contexts/MessagesProvider";
 
 export default function Resources() {
+  const { addMessage } = useMessages();
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["resources"],
     queryFn: async () => {
       const response = await fetch("api/v1/resources");
       if (!response.ok) {
+        addMessage("User is unauthorized to access resources", "error");
         return { message: "Unauthorized" };
       }
+      addMessage("Resources fetched", "success");
       return response.json();
     },
   });
