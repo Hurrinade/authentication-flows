@@ -5,7 +5,6 @@ This is a full-stack authentication demonstration project built with modern web 
 # 🚧 STILL IN WORK
 
 - whole frontend
-- final prisma models
 - production build and dockerization
 
 ## What is going on 🤓
@@ -95,6 +94,10 @@ POSTGRES_USER=exampleuser
 POSTGRES_DB=authentications
 # jwt secret which is used to sign jwt token, generate your own
 JWT_SECRET=some_secret
+# jwt secret which is used to sign jwt access token, generate your own
+JWT_ACCESS_SECRET=some_access_secret
+# session secret to sign that session
+SESSION_SECRET=some_session_secret
 
 # production
 PORT=8080

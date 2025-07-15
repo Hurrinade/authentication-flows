@@ -19,3 +19,19 @@ export const checkToken = (req: Request, res: Response, next: NextFunction) => {
 
   return next();
 };
+
+export const checkSession = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  // Check if session has user id which makes it valid and statefull
+  if (!(req.session as any)?.userId || !(req.session as any)?.email) {
+    console.error("<middlewares.ts>(check-session)[ERROR] Session is invalid");
+    return res
+      .status(401)
+      .json({ data: "Missing Session (session invalid)", error: true });
+  }
+
+  return next();
+};

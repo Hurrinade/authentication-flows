@@ -15,7 +15,7 @@ import {
   updateToken,
 } from "../services/tokenService";
 import { reissueAccessToken } from "../utils/tokens";
-import { checkToken } from "../middlwares/middlewares";
+import { checkSession, checkToken } from "../middlwares/middlewares";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 // TODO: unitfy login and register token per mode handling (separate into functions)
@@ -233,6 +233,7 @@ router.post("/logout", validateLogout, async (req: Request, res: Response) => {
   // If it is only simple mode for logout just delete cookie
   if (req.body.mode === "stateless_simple") {
     return res
+      .clearCookie("connect.sid")
       .clearCookie("token")
       .status(200)
       .json({ data: "Logged out", error: false });
@@ -260,6 +261,7 @@ router.post("/logout", validateLogout, async (req: Request, res: Response) => {
     }
 
     res
+      .clearCookie("connect.sid")
       .clearCookie("token")
       .status(200)
       .json({ data: "Logged out", error: false });
@@ -277,6 +279,7 @@ router.post("/logout", validateLogout, async (req: Request, res: Response) => {
 
     return res
       .clearCookie("connect.sid")
+      .clearCookie("token")
       .status(200)
       .json({ data: "Logged out", error: false });
   });
@@ -370,9 +373,10 @@ router.get("/user", [checkToken], async (req: Request, res: Response) => {
 });
 
 // Check if session is valid
-router.get("/check-session", async (req: Request, res: Response) => {
-  if ((req.session as any).userId) {
-    // Get user from db
+router.get(
+  "/session-user",
+  [checkSession],
+  async (req: Request, res: Response) => {
     const user = await getUser((req.session as any).email);
 
     if (user._tag === "Failure") {
@@ -384,8 +388,6 @@ router.get("/check-session", async (req: Request, res: Response) => {
       .status(200)
       .json({ data: { email: user.data.email }, error: false });
   }
-  console.error("<authentication.ts>(check-session)[ERROR] User not found");
-  return res.status(401).json({ data: "Unauthorized", error: true });
-});
+);
 
 export default router;

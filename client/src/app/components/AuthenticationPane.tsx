@@ -28,7 +28,7 @@ export default function AuthenticationPane({ mode }: { mode: string }) {
         body: JSON.stringify({
           email: userData.email,
           password: userData.password,
-          mode: "stateless_simple",
+          mode: mode,
         }),
       });
 
@@ -53,7 +53,7 @@ export default function AuthenticationPane({ mode }: { mode: string }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          mode: "stateless_simple",
+          mode: mode,
         }),
       });
 
@@ -235,7 +235,11 @@ export default function AuthenticationPane({ mode }: { mode: string }) {
                 </svg>
                 Your Resources
               </h4>
-              <Resources />
+              <Resources
+                resourcesRoute={
+                  mode === "statefull" ? "session-resources" : "resources"
+                }
+              />
             </div>
 
             {/* Logout Section */}

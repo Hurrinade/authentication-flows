@@ -1,12 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMessages } from "../contexts/MessagesProvider";
 
-export default function Resources() {
+export default function Resources({
+  resourcesRoute,
+}: {
+  resourcesRoute: string;
+}) {
   const { addMessage } = useMessages();
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["resources"],
     queryFn: async () => {
-      const response = await fetch("api/v1/resources");
+      const response = await fetch(`api/v1/${resourcesRoute}`);
       const data = await response.json();
 
       if (data.error) {
@@ -20,7 +24,6 @@ export default function Resources() {
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
-
   if (data.error) return <div>{data.data}</div>;
 
   return (
