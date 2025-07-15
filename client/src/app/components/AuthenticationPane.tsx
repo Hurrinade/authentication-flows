@@ -32,14 +32,14 @@ export default function AuthenticationPane({ mode }: { mode: string }) {
         }),
       });
 
-      if (!response.ok) {
-        addMessage(`Failed to ${authMethod}`, "error");
-        return { message: "Failed to register" };
+      const data = await response.json();
+      if (data.error) {
+        addMessage(data.data, "error");
+        return data;
       }
 
-      const data = await response.json();
       setShowProtected(true);
-      setUser({ email: data.email });
+      setUser({ email: data.data.email });
       addMessage(`User ${authMethod} success`, "success");
       return data;
     },
@@ -56,9 +56,11 @@ export default function AuthenticationPane({ mode }: { mode: string }) {
           mode: "stateless_simple",
         }),
       });
-      if (!response.ok) {
-        addMessage("Failed to logout", "error");
-        return { message: "Failed to logout" };
+
+      const data = await response.json();
+      if (data.error) {
+        addMessage(data.data, "error");
+        return data;
       }
       setUser(null);
       addMessage("User logged out", "success");
