@@ -13,15 +13,16 @@ export default function SimpleJWT() {
     queryKey: ["user"],
     queryFn: async () => {
       const response = await fetch("api/v1/user");
-      if (!response.ok) {
+      const data = await response.json();
+
+      if (data.error) {
         setUser(null);
         setShowProtected(false);
-        addMessage("User is not logged in", "error");
-        return { message: "Unauthorized" };
+        addMessage(data.data, "error");
+        return data;
       }
-      const data = await response.json();
       setShowProtected(true);
-      setUser({ email: data.email });
+      setUser({ email: data.data.email });
       addMessage("User is logged in", "success");
       return data;
     },

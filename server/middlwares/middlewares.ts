@@ -8,13 +8,13 @@ export const checkToken = (req: Request, res: Response, next: NextFunction) => {
 
   if (result._tag === "Failure") {
     console.error("<middlewares.ts>(checkToken)[ERROR] Verify Failed");
-    return res.status(401).json({ error: result.error });
+    return res.status(401).json({ data: "Token is invalid", error: true });
   }
 
   // If there is no user id in the token it is invalid
   if (!result.data.aud) {
     console.error("<middlewares.ts>(checkToken)[ERROR] No user id in token");
-    return res.status(401).json({ error: "Unauthorized" });
+    return res.status(401).json({ data: "Unauthorized", error: true });
   }
 
   return next();

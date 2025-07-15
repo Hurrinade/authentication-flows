@@ -7,21 +7,21 @@ export default function Resources() {
     queryKey: ["resources"],
     queryFn: async () => {
       const response = await fetch("api/v1/resources");
-      if (!response.ok) {
-        addMessage("User is unauthorized to access resources", "error");
-        return { message: "Unauthorized" };
+      const data = await response.json();
+
+      if (data.error) {
+        addMessage(data.data, "error");
+        return data;
       }
       addMessage("Resources fetched", "success");
-      return response.json();
+      return data;
     },
   });
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
-  if (data.message === "Unauthorized") {
-    return <div>{data.message}</div>;
-  }
+  if (data.error) return <div>{data.data}</div>;
 
   return (
     <div>
@@ -35,7 +35,7 @@ export default function Resources() {
         </button>
       </div>
       <div className="flex flex-col gap-4">
-        {data.map((resource: any) => (
+        {data.data.map((resource: any) => (
           <div key={resource.id}>{resource.id}</div>
         ))}
       </div>

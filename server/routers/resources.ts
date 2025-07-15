@@ -11,7 +11,7 @@ router.get("/resources", [checkToken], (_: Request, res: Response) => {
     { id: Math.floor(Math.random() * 100000) + 2, name: "Resource 2" },
     { id: Math.floor(Math.random() * 100000) + 3, name: "Resource 3" },
   ];
-  res.json(resources);
+  res.status(200).json({ data: resources, error: false });
 });
 
 export default router;
