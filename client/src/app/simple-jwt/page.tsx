@@ -34,8 +34,14 @@ export default function SimpleJWT() {
     <div className="min-h-screen">
       {/* Header */}
       <div className="bg-gray-800/50 backdrop-blur-sm border-b border-gray-700">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <h1 className="text-2xl font-bold text-white">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+          <a
+            href="/"
+            className="text-xl font-bold text-white hover:text-blue-400 transition-colors duration-200"
+          >
+            Auth App
+          </a>
+          <h1 className="text-m font-bold text-white">
             Simple JWT Authentication
           </h1>
         </div>
