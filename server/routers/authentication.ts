@@ -25,16 +25,11 @@ const router: Router = Router();
 const saltRounds = 10;
 
 // Handle stateless authentication
-router.post("/logout-stateless", (req: Request, res: Response) => {
-  console.log("logout-stateless", req.body);
-  res.send("Hello World Logout");
-});
-
 router.post("/login", validateLogin, async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     console.error("<authentication.ts>(login)[ERROR] Validation failed");
-    res.status(400).json({ data: "Validation failed", error: true });
+    res.status(400).json({ data: "(login) Validation failed", error: true });
     return;
   }
 
@@ -44,13 +39,15 @@ router.post("/login", validateLogin, async (req: Request, res: Response) => {
 
   if (user._tag === "Failure") {
     console.error("<authentication.ts>(login)[ERROR] User not found");
-    res.status(400).json({ data: "User not found", error: true });
+    res.status(400).json({ data: "(login) User not found", error: true });
     return;
   }
 
   if (!process.env.JWT_SECRET || !process.env.JWT_ACCESS_SECRET) {
     console.error("<authentication.ts>(login)[ERROR] JWT_SECRET is not set");
-    res.status(500).json({ data: "JWT_SECRET is not set", error: true });
+    res
+      .status(500)
+      .json({ data: "(login) JWT_SECRET is not set", error: true });
     return;
   }
 
@@ -60,7 +57,7 @@ router.post("/login", validateLogin, async (req: Request, res: Response) => {
 
   if (!isPasswordValid) {
     console.error("<authentication.ts>(login)[ERROR] Invalid password");
-    res.status(400).json({ data: "Invalid password", error: true });
+    res.status(400).json({ data: "(login) Invalid password", error: true });
     return;
   }
 
@@ -96,7 +93,9 @@ router.post("/login", validateLogin, async (req: Request, res: Response) => {
 
     if (tokenResult._tag === "Failure") {
       console.error("<authentication.ts>(login)[ERROR] Token storing failed");
-      res.status(500).json({ data: "Token storing failed", error: true });
+      res
+        .status(500)
+        .json({ data: "(login) Token storing failed", error: true });
       return;
     }
 
@@ -129,7 +128,9 @@ router.post(
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       console.error("<authentication.ts>(register)[ERROR] Validation failed");
-      res.status(400).json({ data: "Validation failed", error: true });
+      res
+        .status(400)
+        .json({ data: "(register) Validation failed", error: true });
       return;
     }
 
@@ -143,7 +144,9 @@ router.post(
       console.error(
         "<authentication.ts>(register)[ERROR] User creation failed"
       );
-      res.status(400).json({ data: "User creation failed", error: true });
+      res
+        .status(400)
+        .json({ data: "(register) User creation failed", error: true });
       return;
     }
 
@@ -152,7 +155,7 @@ router.post(
         "<authentication.ts>(register)[ERROR] JWT_SECRET or JWT_ACCESS_SECRET is not set"
       );
       res.status(500).json({
-        data: "JWT_SECRET or JWT_ACCESS_SECRET is not set",
+        data: "(register) JWT_SECRET or JWT_ACCESS_SECRET is not set",
         error: true,
       });
       return;
@@ -193,7 +196,9 @@ router.post(
         console.error(
           "<authentication.ts>(register)[ERROR] Token storing failed"
         );
-        res.status(500).json({ data: "Token storing failed", error: true });
+        res
+          .status(500)
+          .json({ data: "(register) Token storing failed", error: true });
         return;
       }
 
@@ -226,7 +231,7 @@ router.post("/logout", validateLogout, async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     console.error("<authentication.ts>(logout)[ERROR] Validation failed");
-    res.status(400).json({ data: "Validation failed", error: true });
+    res.status(400).json({ data: "(logout) Validation failed", error: true });
     return;
   }
 
@@ -236,14 +241,14 @@ router.post("/logout", validateLogout, async (req: Request, res: Response) => {
       .clearCookie("connect.sid")
       .clearCookie("token")
       .status(200)
-      .json({ data: "Logged out", error: false });
+      .json({ data: "(logout) Logged out", error: false });
   } else if (req.body.mode === "hybrid") {
     const refreshToken = req.cookies["token"];
     const payloadResult = verifyToken(refreshToken, process.env.JWT_SECRET!);
 
     if (payloadResult._tag === "Failure") {
       console.error("<authentication.ts>(logout)[ERROR] Invalid token");
-      res.status(401).json({ data: "Invalid token", error: true });
+      res.status(401).json({ data: "(logout) Invalid token", error: true });
       return;
     }
 
@@ -256,7 +261,9 @@ router.post("/logout", validateLogout, async (req: Request, res: Response) => {
 
     if (tokenResult._tag === "Failure") {
       console.error("<authentication.ts>(logout)[ERROR] Token update failed");
-      res.status(500).json({ data: "Token update failed", error: true });
+      res
+        .status(500)
+        .json({ data: "(logout) Token update failed", error: true });
       return;
     }
 
@@ -264,7 +271,7 @@ router.post("/logout", validateLogout, async (req: Request, res: Response) => {
       .clearCookie("connect.sid")
       .clearCookie("token")
       .status(200)
-      .json({ data: "Logged out", error: false });
+      .json({ data: "(logout) Logged out", error: false });
     return;
   }
 
@@ -281,7 +288,7 @@ router.post("/logout", validateLogout, async (req: Request, res: Response) => {
       .clearCookie("connect.sid")
       .clearCookie("token")
       .status(200)
-      .json({ data: "Logged out", error: false });
+      .json({ data: "(logout) Logged out", error: false });
   });
 
   return;
@@ -298,7 +305,7 @@ router.post("/refresh", async (req: Request, res: Response) => {
       return res
         .clearCookie("token")
         .status(401)
-        .json({ data: "Token reissue failed", error: true });
+        .json({ data: "(refresh) Token reissue failed", error: true });
     }
 
     return res
@@ -317,7 +324,7 @@ router.post("/refresh", async (req: Request, res: Response) => {
     return res
       .clearCookie("token")
       .status(500)
-      .json({ data: "Internal server error", error: true });
+      .json({ data: "(refresh) Internal server error", error: true });
   }
 });
 
@@ -335,19 +342,25 @@ router.get(
 
     if (dbRefreshToken._tag === "Failure") {
       console.error("<authentication.ts>(check-token)[ERROR] Token not found");
-      return res.status(401).json({ data: "Token not found", error: true });
+      return res
+        .status(401)
+        .json({ data: "(check-token) Token not found", error: true });
     }
 
     if (dbRefreshToken.data.refreshToken !== refreshToken) {
       console.error("<authentication.ts>(check-token)[ERROR] Token mismatch");
-      return res.status(401).json({ data: "Unauthorized", error: true });
+      return res
+        .status(401)
+        .json({ data: "(check-token) Unauthorized", error: true });
     }
 
     const user = await getUser((payload as JwtPayload).email as string);
 
     if (user._tag === "Failure") {
       console.error("<authentication.ts>(check-token)[ERROR] User not found");
-      return res.status(404).json({ data: "User not found", error: true });
+      return res
+        .status(404)
+        .json({ data: "(check-token) User not found", error: true });
     }
 
     return res
@@ -364,7 +377,7 @@ router.get("/user", [checkToken], async (req: Request, res: Response) => {
 
   if (result._tag === "Failure") {
     console.error("<authentication.ts>(user)[ERROR] User not found");
-    return res.status(404).json({ data: "User not found", error: true });
+    return res.status(404).json({ data: "(user) User not found", error: true });
   }
 
   return res
@@ -381,7 +394,9 @@ router.get(
 
     if (user._tag === "Failure") {
       console.error("<authentication.ts>(check-session)[ERROR] User not found");
-      return res.status(404).json({ data: "User not found", error: true });
+      return res
+        .status(404)
+        .json({ data: "(session-user) User not found", error: true });
     }
 
     return res
