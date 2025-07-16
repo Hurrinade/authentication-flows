@@ -4,7 +4,7 @@ import {
   validateRegister,
   validateLogout,
 } from "../middlwares/validations";
-import { LONG_EXPIRE_TIME } from "../utils/constants";
+import { LONG_EXPIRE_TIME, TOKEN_LONG_EXPIRE_TIME } from "../utils/constants";
 import { createToken, createTokens, verifyToken } from "../utils/tokens";
 import { validationResult } from "express-validator";
 import { createUser, getUser } from "../services/userService";
@@ -67,7 +67,7 @@ router.post("/login", validateLogin, async (req: Request, res: Response) => {
       { email },
       user.data.id,
       process.env.JWT_SECRET,
-      LONG_EXPIRE_TIME
+      TOKEN_LONG_EXPIRE_TIME
     );
 
     return res
@@ -166,7 +166,7 @@ router.post(
         { email },
         user.data.id,
         process.env.JWT_SECRET,
-        LONG_EXPIRE_TIME
+        TOKEN_LONG_EXPIRE_TIME
       );
 
       return res
@@ -295,7 +295,7 @@ router.post("/logout", validateLogout, async (req: Request, res: Response) => {
 });
 
 // Refresh access token
-router.post("/refresh", async (req: Request, res: Response) => {
+router.post("/refresh", [checkToken], async (req: Request, res: Response) => {
   try {
     const refreshToken = req.cookies["token"];
     const result = await reissueAccessToken(refreshToken);

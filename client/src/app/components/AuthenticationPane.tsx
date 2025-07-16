@@ -6,7 +6,8 @@ import Resources from "./Resources";
 
 export default function AuthenticationPane({ mode }: { mode: string }) {
   const { addMessage } = useMessages();
-  const { user, setUser, showProtected, setShowProtected } = useUser();
+  const { user, setUser, showProtected, setShowProtected, setAccessToken } =
+    useUser();
   const [userData, setUserData] = useState<{
     email: string;
     password: string;
@@ -38,6 +39,11 @@ export default function AuthenticationPane({ mode }: { mode: string }) {
         return data;
       }
 
+      // Only in hybrid mode we need to set the access token
+      if (mode === "hybrid") {
+        setAccessToken(data.data.accessToken);
+      }
+
       setShowProtected(true);
       setUser({ email: data.data.email });
       addMessage(`User ${authMethod} success`, "success");
@@ -62,6 +68,11 @@ export default function AuthenticationPane({ mode }: { mode: string }) {
         addMessage(data.data, "error");
         return data;
       }
+
+      if (mode === "hybrid") {
+        setAccessToken(null);
+      }
+
       setUser(null);
       addMessage("User logged out", "success");
       return;

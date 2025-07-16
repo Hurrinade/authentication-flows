@@ -1,8 +1,9 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { Result, ok, err } from "../types/return";
-import { SHORT_EXPIRE_TIME, LONG_EXPIRE_TIME } from "./constants";
+import { TOKEN_SHORT_EXPIRE_TIME, TOKEN_LONG_EXPIRE_TIME } from "./constants";
 import { getUserToken, updateToken } from "../services/tokenService";
 
+// Function to create a new token with a given secret and expiration time, audience and data
 export function createToken(
   data: any,
   userId: string,
@@ -15,12 +16,13 @@ export function createToken(
   });
 }
 
+// Function to create a new refresh and access token with a given secret and expiration time, audience and data
 export function createTokens(userId: string, data: Record<string, any>) {
   const refreshToken = createToken(
     data,
     userId,
     process.env.JWT_SECRET!,
-    LONG_EXPIRE_TIME
+    TOKEN_LONG_EXPIRE_TIME
   );
 
   // Create access token
@@ -28,7 +30,7 @@ export function createTokens(userId: string, data: Record<string, any>) {
     data,
     userId,
     process.env.JWT_ACCESS_SECRET!,
-    SHORT_EXPIRE_TIME
+    TOKEN_SHORT_EXPIRE_TIME
   );
 
   return {
@@ -37,6 +39,7 @@ export function createTokens(userId: string, data: Record<string, any>) {
   };
 }
 
+// Function to verify a token with a given secret
 export function verifyToken(
   token: string,
   jwtSecret: string
@@ -66,7 +69,7 @@ export async function reissueAccessToken(
 
   try {
     // Check if refresh token is valid
-    const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+    const decoded = jwt.decode(refreshToken);
     const userId = (decoded as JwtPayload).aud;
 
     // If aud is missing token is invalid
