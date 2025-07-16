@@ -328,47 +328,6 @@ router.post("/refresh", [checkToken], async (req: Request, res: Response) => {
   }
 });
 
-// Check if token is valid
-router.get(
-  "/check-refresh-token",
-  [checkToken],
-  async (req: Request, res: Response) => {
-    const refreshToken = req.cookies["token"];
-    // Just decode no need to verify because middleware already did it
-    const payload = jwt.decode(refreshToken);
-    const dbRefreshToken = await getUserToken(
-      (payload as JwtPayload).aud as string
-    );
-
-    if (dbRefreshToken._tag === "Failure") {
-      console.error("<authentication.ts>(check-token)[ERROR] Token not found");
-      return res
-        .status(401)
-        .json({ data: "(check-token) Token not found", error: true });
-    }
-
-    if (dbRefreshToken.data.refreshToken !== refreshToken) {
-      console.error("<authentication.ts>(check-token)[ERROR] Token mismatch");
-      return res
-        .status(401)
-        .json({ data: "(check-token) Unauthorized", error: true });
-    }
-
-    const user = await getUser((payload as JwtPayload).email as string);
-
-    if (user._tag === "Failure") {
-      console.error("<authentication.ts>(check-token)[ERROR] User not found");
-      return res
-        .status(404)
-        .json({ data: "(check-token) User not found", error: true });
-    }
-
-    return res
-      .status(200)
-      .json({ data: { email: user.data.email }, error: false });
-  }
-);
-
 router.get("/user", [checkToken], async (req: Request, res: Response) => {
   const token = req.cookies["token"];
   const payload = jwt.decode(token);

@@ -8,7 +8,7 @@ export default function Resources({
   resourcesRoute: string;
 }) {
   const { addMessage } = useMessages();
-  const { accessToken } = useUser();
+  const { accessToken, setAccessToken, setUser, setShowProtected } = useUser();
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["resources"],
     queryFn: async () => {
@@ -21,10 +21,55 @@ export default function Resources({
 
       if (data.error) {
         addMessage(data.data, "error");
+        if (response.status === 401 && resourcesRoute === "hybrid-resources") {
+          setAccessToken(null);
+          const internalResponse = await fetch(`api/v1/refresh`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+          const internalData = await internalResponse.json();
+
+          if (internalData.error) {
+            setUser(null);
+            setShowProtected(false);
+            addMessage(
+              "Refreshing token failed: " + internalData.data,
+              "error",
+            );
+            throw new Error("REFRESH_FAILED");
+          }
+
+          setAccessToken(internalData.data.accessToken);
+          const internalAccessResponse = await fetch(
+            `api/v1/${resourcesRoute}`,
+            {
+              headers: {
+                Authorization: `Bearer ${internalData.data.accessToken}`,
+              },
+            },
+          );
+
+          const internalAccessData = await internalAccessResponse.json();
+          if (internalAccessData.error) {
+            throw new Error("REFRESH_FAILED");
+          }
+
+          addMessage("Resources fetched", "success");
+          return internalAccessData;
+        }
+
         return data;
       }
       addMessage("Resources fetched", "success");
       return data;
+    },
+    retry: (failureCount, error) => {
+      if (error.message === "REFRESH_FAILED") {
+        return false;
+      }
+      return failureCount < 2;
     },
   });
 

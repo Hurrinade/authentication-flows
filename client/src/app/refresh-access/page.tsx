@@ -7,7 +7,7 @@ import { useUser } from "../contexts/UserProvider";
 import { useMessages } from "../contexts/MessagesProvider";
 
 export default function RefreshAccess() {
-  const { setUser, setShowProtected, accessToken, setAccessToken } = useUser();
+  const { setUser, setShowProtected, setAccessToken } = useUser();
   const { addMessage } = useMessages();
   const { isLoading } = useQuery({
     queryKey: ["session-user"],

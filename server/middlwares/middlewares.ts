@@ -9,13 +9,21 @@ export const checkToken = (req: Request, res: Response, next: NextFunction) => {
 
   if (result._tag === "Failure") {
     console.error("<middlewares.ts>(checkToken)[ERROR] Verify Failed");
-    return res.status(401).json({ data: "Token is invalid", error: true });
+    return res
+      .clearCookie("connect.sid")
+      .clearCookie("token")
+      .status(401)
+      .json({ data: "Token is invalid", error: true });
   }
 
   // If there is no user id in the token it is invalid
   if (!result.data.aud) {
     console.error("<middlewares.ts>(checkToken)[ERROR] No user id in token");
-    return res.status(401).json({ data: "Unauthorized", error: true });
+    return res
+      .clearCookie("connect.sid")
+      .clearCookie("token")
+      .status(401)
+      .json({ data: "Unauthorized", error: true });
   }
 
   return next();
@@ -69,6 +77,8 @@ export const checkSession = (
     console.error("<middlewares.ts>(check-session)[ERROR] Session is invalid");
     return res
       .status(401)
+      .clearCookie("connect.sid")
+      .clearCookie("token")
       .json({ data: "Missing Session (session invalid)", error: true });
   }
 

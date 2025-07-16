@@ -4,7 +4,7 @@ This is a full-stack authentication demonstration project built with modern web 
 
 # 🚧 STILL IN WORK
 
-- refresh access tokens frontned part - refresh access token when it gets invalid
+- dockerize frontend
 - production build and dockerization
 
 ## What is going on 🤓
