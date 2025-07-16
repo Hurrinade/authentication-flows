@@ -9,11 +9,7 @@ import { createToken, createTokens, verifyToken } from "../utils/tokens";
 import { validationResult } from "express-validator";
 import { createUser, getUser } from "../services/userService";
 import bcrypt from "bcrypt";
-import {
-  getUserToken,
-  storeTokens,
-  updateToken,
-} from "../services/tokenService";
+import { storeTokens, updateToken } from "../services/tokenService";
 import { reissueAccessToken } from "../utils/tokens";
 import { checkSession, checkToken } from "../middlwares/middlewares";
 import jwt, { JwtPayload } from "jsonwebtoken";
