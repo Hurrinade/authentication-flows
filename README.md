@@ -4,7 +4,6 @@ This is a full-stack authentication demonstration project built with modern web 
 
 # 🚧 STILL IN WORK
 
-- dockerize frontend
 - production build and dockerization
 
 ## What is going on 🤓

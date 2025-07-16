@@ -2,7 +2,7 @@
 FROM node:22-alpine
 
 # Set working directory
-WORKDIR /app/server
+WORKDIR /app/client
 
 # Install pnpm globally
 RUN npm install -g pnpm

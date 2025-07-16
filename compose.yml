@@ -31,10 +31,10 @@ services:
     # When pc restarts it will start the server again, until I stop it with docker stop
     # restart: unless-stopped
     volumes:
-      - ./server:/app
-      - /app/prisma # perserve docker generated
-      - /app/generated # perserve docker generated
-      - /app/node_modules # This is perserved and not overwritten by command above
+      - ./server:/app/server
+      - /app/server/prisma # perserve docker generated
+      - /app/server/generated # perserve docker generated
+      - /app/server/node_modules # This is perserved and not overwritten by command above
     # Reset whole database and Run initial prisma migration to create the database and start the server
     command: sh -c "npx prisma migrate reset --force && npx prisma migrate dev --name init && pnpm run dev"
 
@@ -49,3 +49,17 @@ services:
       # Uses container env variables, defined with --env-file when runing docker compose
       ports:
         - "8080:8080"
+
+  # Development frontend
+  dev-frontend:
+    container_name: dev-frontend-container
+    build:
+      context: ./client
+      dockerfile: dev.Dockerfile
+    env_file: "./.env.development"
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./client:/app/client
+      - /app/client/node_modules # This is perserved and not overwritten by command above
+    command: sh -c "pnpm run dev"
