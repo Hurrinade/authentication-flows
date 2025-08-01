@@ -41,7 +41,7 @@ export const updateToken = async (data: {
 };
 
 export const getUserToken = async (
-  userId: string,
+  userId: string
 ): Promise<Result<UserToken, string>> => {
   try {
     const token = await prisma.userToken.findUnique({
