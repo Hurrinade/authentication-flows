@@ -4,7 +4,7 @@
 FROM node:22-alpine
 
 # Set working directory
-WORKDIR /app
+WORKDIR /app/server
 
 # Install pnpm globally
 RUN npm install -g pnpm
@@ -17,8 +17,6 @@ RUN pnpm install
 
 # Copy source code
 COPY . .
-
-RUN --mount=type=secret,id=_env,dst=/etc/secrets/.env cat /etc/secrets/.env
 
 # Build the TypeScript application
 RUN --mount=type=secret,id=_env,dst=/etc/secrets/.env pnpm run build
