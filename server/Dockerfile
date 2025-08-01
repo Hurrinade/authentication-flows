@@ -1,3 +1,5 @@
+# syntax = docker/dockerfile:1
+
 # Use Node.js 22 Alpine as base image
 FROM node:22-alpine
 
@@ -16,8 +18,10 @@ RUN pnpm install
 # Copy source code
 COPY . .
 
+RUN --mount=type=secret,id=_env,dst=/etc/secrets/.env cat /etc/secrets/.env
+
 # Build the TypeScript application
-RUN pnpm run build
+RUN --mount=type=secret,id=_env,dst=/etc/secrets/.env pnpm run build
 
 # Start the production application, always built project, does not depend on dist of project itself
-CMD ["pnpm", "run", "prod"]
+CMD ["pnpm", "run", "start"]
