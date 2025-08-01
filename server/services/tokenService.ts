@@ -1,6 +1,6 @@
 import { prisma } from "../index";
 import { Result, ok, err } from "../types/return";
-import { UserToken } from "../generated/prisma";
+import { UserToken } from "@prisma/client";
 
 export const storeTokens = async (data: {
   refreshToken: string;

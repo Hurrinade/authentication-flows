@@ -3,7 +3,7 @@ import authRouter from "./routers/authentication";
 import resourcesRouter from "./routers/resources";
 import cookieParser from "cookie-parser";
 import session from "express-session";
-import { PrismaClient } from "./generated/prisma";
+import { PrismaClient } from "@prisma/client";
 import { LONG_EXPIRE_TIME } from "./utils/constants";
 import cors from "cors";
 import "dotenv/config";

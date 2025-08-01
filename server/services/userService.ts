@@ -1,4 +1,4 @@
-import { User } from "../generated/prisma";
+import { User } from "@prisma/client";
 import { prisma } from "../index";
 import { Result, ok, err } from "../types/return";
 
@@ -14,7 +14,7 @@ import { Result, ok, err } from "../types/return";
 
 // Create new user
 export const createUser = async (
-  user: Omit<User, "id">,
+  user: Omit<User, "id">
 ): Promise<Result<User, string>> => {
   try {
     const newUser = await prisma.user.create({
