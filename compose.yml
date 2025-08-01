@@ -62,4 +62,4 @@ services:
     volumes:
       - ./client:/app/client
       - /app/client/node_modules # This is perserved and not overwritten by command above
-    command: sh -c "pnpm run dev"
+    command: sh -c "pnpm run dev_docker"
