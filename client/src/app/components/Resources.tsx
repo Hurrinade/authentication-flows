@@ -89,7 +89,7 @@ export default function Resources({
         </button>
       </div>
       <div className="flex flex-col gap-4">
-        {data.data.map((resource: any) => (
+        {data.data.map((resource: { id: string }) => (
           <div key={resource.id}>{resource.id}</div>
         ))}
       </div>
