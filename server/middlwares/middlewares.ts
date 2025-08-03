@@ -17,7 +17,7 @@ export const checkToken = (req: Request, res: Response, next: NextFunction) => {
   }
 
   // If there is no user id in the token it is invalid
-  if (!result.data.aud) {
+  if (!result.data.sub) {
     console.error("<middlewares.ts>(checkToken)[ERROR] No user id in token");
     return res
       .clearCookie("connect.sid")
@@ -59,7 +59,7 @@ export const checkAccessToken = (
   }
 
   // If there is no user id in the token it is invalid
-  if (!result.data.aud) {
+  if (!result.data.sub) {
     console.error("<middlewares.ts>(checkToken)[ERROR] No user id in token");
     return res.status(401).json({ data: "Unauthorized", error: true });
   }
