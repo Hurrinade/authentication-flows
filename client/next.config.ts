@@ -5,7 +5,7 @@ const isTest = process.env.NODE_ENV === "test";
 
 let url = "http://localhost:3001";
 if (isProduction) {
-  url = "https://authentication-server-hvph.onrender.com";
+  url = "https://authapi.rinadely.com";
 } else if (isTest) {
   url = "http://dev-server:3000";
 }
