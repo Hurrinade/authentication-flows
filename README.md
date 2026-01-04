@@ -2,9 +2,9 @@
 
 This is a full-stack authentication demonstration project built with modern web technologies. The application showcases both stateless (JWT-based) and stateful (session-based) authentication patterns, providing developers with practical examples of different authentication strategies. Also it uses secure way of storing passwords with salt and hash.
 
-# 🚧 STILL IN WORK
+Medium in depth post: https://medium.com/@marko.uremovic00/why-skipping-authentication-basics-can-break-your-app-7515fab9271a
 
-- production build and dockerization
+Website: https://auth.rinadely.com/ 
 
 ## What is going on 🤓
 

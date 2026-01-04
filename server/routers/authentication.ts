@@ -248,7 +248,7 @@ router.post("/logout", validateLogout, async (req: Request, res: Response) => {
       return;
     }
 
-    const userId = payloadResult.data.aud as string;
+    const userId = payloadResult.data.sub as string;
 
     const tokenResult = await updateToken({
       refreshToken: "",

@@ -3,7 +3,7 @@ import { Result, ok, err } from "../types/return";
 import { TOKEN_SHORT_EXPIRE_TIME, TOKEN_LONG_EXPIRE_TIME } from "./constants";
 import { getUserToken, updateToken } from "../services/tokenService";
 
-// Function to create a new token with a given secret and expiration time, audience and data
+// Function to create a new token with a given secret and expiration time, subject and data
 export function createToken(
   data: any,
   userId: string,
@@ -12,11 +12,11 @@ export function createToken(
 ) {
   return jwt.sign(data, jwtSecret, {
     expiresIn: expireTime,
-    audience: userId,
+    subject: userId,
   });
 }
 
-// Function to create a new refresh and access token with a given secret and expiration time, audience and data
+// Function to create a new refresh and access token with a given secret and expiration time, subject and data
 export function createTokens(userId: string, data: Record<string, any>) {
   const refreshToken = createToken(
     data,
@@ -70,12 +70,12 @@ export async function reissueAccessToken(
   try {
     // Check if refresh token is valid
     const decoded = jwt.decode(refreshToken);
-    const userId = (decoded as JwtPayload).aud;
+    const userId = (decoded as JwtPayload).sub;
 
-    // If aud is missing token is invalid
+    // If sub is missing token is invalid
     if (!userId) {
       console.error(
-        "<tokens.ts>(reissueAccessToken)[ERROR] User ID is missing from aud"
+        "<tokens.ts>(reissueAccessToken)[ERROR] User ID is missing from sub"
       );
       return err("Token invalid");
     }
