@@ -16,9 +16,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Auth App",
+  title: "Auth methods | JWT, refresh token, and session authentication demo",
   description:
-    "Auth App for different types of authentication (stateless, statefull, jwt, session)",
+    "A working demo of three authentication patterns: stateless JWT, hybrid access and refresh tokens with rotation, and stateful sessions, with salted password hashing.",
 };
 
 export default function RootLayout({

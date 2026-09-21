@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import SiteFooter from "./components/SiteFooter";
 
 export default function Home() {
   const router = useRouter();
@@ -121,6 +122,8 @@ export default function Home() {
             </div>
           </button>
         </div>
+
+        <SiteFooter />
       </div>
     </div>
   );
