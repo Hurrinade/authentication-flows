@@ -15,10 +15,40 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl = "https://auth.rinadely.com";
+const siteTitle =
+  "Auth methods | JWT, refresh token, and session authentication demo";
+const siteDescription =
+  "A working demo of three authentication patterns: stateless JWT, hybrid access and refresh tokens with rotation, and stateful sessions, with salted password hashing.";
+
 export const metadata: Metadata = {
-  title: "Auth methods | JWT, refresh token, and session authentication demo",
-  description:
-    "A working demo of three authentication patterns: stateless JWT, hybrid access and refresh tokens with rotation, and stateful sessions, with salted password hashing.",
+  metadataBase: new URL(siteUrl),
+  title: siteTitle,
+  description: siteDescription,
+  alternates: {
+    canonical: "./",
+  },
+  openGraph: {
+    type: "website",
+    siteName: "Auth methods",
+    title: siteTitle,
+    description: siteDescription,
+    url: "./",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Auth methods: JWT, refresh token, and session authentication demo",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteTitle,
+    description: siteDescription,
+    images: ["/og-image.png"],
+  },
 };
 
 export default function RootLayout({
